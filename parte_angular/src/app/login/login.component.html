@@ -1,3 +1,4 @@
+<!--Funzionalita Auth aggiornate-->
 <div class="container">
   <div class="loginImageContainer">
     <div class="loginContent">
@@ -10,6 +11,7 @@
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <mat-form-field appearance="outline">
               <mat-label>Username</mat-label>
+              <!--Modifica pulsante avvenuta con successo-->
               <input matInput formControlName="username" required>
               <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
                 Username è obbligatorio
