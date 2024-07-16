@@ -1,4 +1,8 @@
+// IndovinelloNumerico.java
 package com.sweng_stories.stories_manager.domain;
+
+
+// aggiunta funzionalita classe
 
 public class IndovinelloNumerico extends Indovinello {
     public IndovinelloNumerico(Long id, String descrizione) {
