@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -11,20 +11,15 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import { HttpClientModule, HttpClient } from '@angular/common/http'; // Importa HttpClientModule e HttpClient
+import { HttpClientModule } from '@angular/common/http';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CreaStoriaComponent } from './crea-storia/crea-storia.component';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { MatAccordion } from '@angular/material/expansion';
-import { MatSelect, MatSelectModule } from '@angular/material/select';
-import { MatOption } from '@angular/material/select';
-
-
-
-
-
+import { MatSelectModule } from '@angular/material/select';
+import { GiocaStoriaComponent } from './gioca-storia/gioca-storia.component';
+import { GestioneScenarioComponent } from './gestione-scenario/gestione-scenario.component';
 
 @NgModule({
   declarations: [
@@ -33,27 +28,28 @@ import { MatOption } from '@angular/material/select';
     NavbarComponent,
     LoginComponent,
     RegisterComponent,
-    CreaStoriaComponent
+    CreaStoriaComponent,
+    GiocaStoriaComponent,
+    GestioneScenarioComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    FormsModule,
     BrowserAnimationsModule,
-    HttpClientModule, // Aggiungi HttpClientModule qui
+    HttpClientModule,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatInputModule, 
+    MatInputModule,
     MatFormFieldModule,
     ReactiveFormsModule,
     MatExpansionModule,
-    MatAccordion,
-    MatSelect,
-    MatOption
-
+    MatSelectModule
   ],
-  providers: [], // Aggiungi il servizio ApiService ai provider
-  bootstrap: [AppComponent]
+  providers: [],
+  bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppModule { }
