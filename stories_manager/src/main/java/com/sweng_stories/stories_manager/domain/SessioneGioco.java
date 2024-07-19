@@ -1,8 +1,6 @@
 // SessioneGioco.java
 package com.sweng_stories.stories_manager.domain;
 
-// aggiunta funzionalita classe
-
 public class SessioneGioco {
     private Utente utente;
     private Storia storiaCorrente;
