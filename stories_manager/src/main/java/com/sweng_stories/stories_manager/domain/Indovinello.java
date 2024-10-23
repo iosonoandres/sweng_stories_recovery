@@ -1,36 +1,71 @@
-// Indovinello.java
 package com.sweng_stories.stories_manager.domain;
 
-public abstract class Indovinello {
-    private Long id;
-    private String descrizione;
+import java.util.ArrayList;
 
-    // // Default constructor. This is necessary because MongoDB code needs to instantiate these objects without providing any parameters initially.
-    // public Indovinello() {
-    // }
+public class Indovinello{
+    private int idScenario;
+    private int idScenarioRispGiusta;
+    private String testoIndovinello;
+    private String risposta;
+    private ArrayList<String> opzioni;
+    private int idScenarioRispSbagliata;
 
-    public abstract boolean verificaRisultato(Object risposta);
-    
-    // Costruttori e getter/setter
-    public Indovinello(Long id, String descrizione) {
-        this.id = id;
-        this.descrizione = descrizione;
-    }
-    
-    public Long getId() {
-        return id;
+    public Indovinello() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Indovinello(int idScenario, int idScenarioRispGiusta, String testoIndovinello, String risposta, ArrayList<String> opzioni, int idScenarioRispSbagliata) {
+        this.idScenario = idScenario;
+        this.idScenarioRispGiusta = idScenarioRispGiusta;
+        this.testoIndovinello = testoIndovinello;
+        this.risposta = risposta;
+        this.opzioni = opzioni;
+        this.idScenarioRispSbagliata = idScenarioRispSbagliata;
     }
 
-    public String getDescrizione() {
-        return descrizione;
+    public void setIdScenario(int idScenario) {
+        this.idScenario = idScenario;
     }
 
-    public void setDescrizione(String descrizione) {
-        this.descrizione = descrizione;
+    public void setIdScenarioRispGiusta(int idScenarioRispGiusta) {
+        this.idScenarioRispGiusta = idScenarioRispGiusta;
     }
-    
+
+    public void setTestoIndovinello(String testoIndovinello) {
+        this.testoIndovinello = testoIndovinello;
+    }
+
+    public void setRisposta(String risposta) {
+        this.risposta = risposta;
+    }
+
+    public void setOpzioni(ArrayList<String> opzioni) {
+        this.opzioni = opzioni;
+    }
+
+    public void setIdScenarioRispSbagliata(int idScenarioRispSbagliata) {
+        this.idScenarioRispSbagliata = idScenarioRispSbagliata;
+    }
+
+    public String getTestoIndovinello() {
+        return testoIndovinello;
+    }
+
+    public String getRisposta() {
+        return risposta;
+    }
+
+    public int getIdScenario() {
+        return idScenario;
+    }
+    public ArrayList<String> getOpzioni() {
+        return opzioni;
+    }
+
+    public int getIdScenarioRispGiusta() {
+        return idScenarioRispGiusta;
+    }
+
+    public int getIdScenarioRispSbagliata() {
+        return idScenarioRispSbagliata;
+    }
 }
