@@ -1,0 +1,51 @@
+<mat-card class="play-story-card" *ngIf="currentScenario">
+  <mat-card-title>{{ currentScenario.descrizione }}</mat-card-title>
+  <mat-card-content>
+    <!-- Descrizione dello scenario -->
+    <div>
+      <p>{{ currentScenario.descrizione }}</p>
+    </div>
+
+    <!-- Sezione Indovinello -->
+    <div *ngIf="currentScenario.indovinelli && currentScenario.indovinelli.length > 0">
+      <h3>{{ currentScenario.indovinelli[0].testoIndovinello }}</h3> <!-- Testo dell'indovinello -->
+      
+      <!-- Input per la risposta -->
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Rispondi all'indovinello</mat-label>
+        <input matInput [(ngModel)]="userRiddleAnswer" placeholder="Inserisci la tua risposta">
+      </mat-form-field>
+
+      <!-- Pulsante per inviare la risposta -->
+      <button mat-raised-button color="primary" (click)="submitRiddle()">Invia Risposta</button>
+    </div>
+
+    <!-- Sezione Alternative -->
+    <div *ngIf="currentScenario.alternatives && currentScenario.alternatives.length > 0; else noAlternatives">
+      <h3>Scegli una delle seguenti opzioni</h3>
+      <div *ngFor="let alternative of currentScenario.alternatives">
+        <button mat-raised-button 
+                color="accent" 
+                (click)="makeChoice(alternative)">
+          {{ alternative.text }}
+        </button>
+      </div>
+    </div>
+    <ng-template #noAlternatives>
+      <p>Nessuna alternativa disponibile per questo scenario.</p>
+    </ng-template>
+
+    <!-- Oggetti da raccogliere -->
+    <div *ngIf="currentScenario.oggetti && currentScenario.oggetti.length > 0; else noItems">
+      <h3>Oggetti disponibili</h3>
+      <div *ngFor="let item of currentScenario.oggetti">
+        <button mat-raised-button color="warn" (click)="collectItem(item)">
+          Raccogli {{ item.nome }}
+        </button>
+      </div>
+    </div>
+    <ng-template #noItems>
+      <p>Nessun oggetto disponibile in questo scenario.</p>
+    </ng-template>
+  </mat-card-content>
+</mat-card>

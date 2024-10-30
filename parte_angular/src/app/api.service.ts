@@ -1,63 +1,162 @@
-// api.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:8080/api';
+  private baseUrl = 'http://localhost:8080/api';  // Cambia con il tuo endpoint
+
+  private httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  };
 
   constructor(private http: HttpClient) { }
 
   // Metodi per interagire con le storie
   getAllStorie(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/storie`);
+    return this.http.get(`${this.baseUrl}/storie`, this.httpOptions).pipe(
+      catchError(this.handleError('getAllStorie'))
+    );
   }
 
   getStoriaById(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/storie/${id}`);
+    return this.http.get<any>(`${this.baseUrl}/storie/${id}`, this.httpOptions).pipe(
+      catchError(this.handleError('getStoriaById'))
+    );
   }
 
-  createStoria(storia: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/storie`, storia);
+  getStoriaConUsername(username: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/storie/utente/${username}`, this.httpOptions).pipe(
+      catchError(this.handleError('getStoriaConUsername'))
+    );
   }
 
-  updateStoria(id: number, storia: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/storie/${id}`, storia);
+  inserisciStoria(storia: any): Observable<any> {
+    console.log("DETTAGLI INVIO POWER");
+    console.log(storia); // Rimuovi JSON.stringify qui
+    const headers = new HttpHeaders({
+        'Content-Type': 'application/json'
+    });
+    return this.http.post<any>(`${this.baseUrl}/storie`, storia, { headers }).pipe(
+        catchError(this.handleError('inserisciStoria'))
+    );
+}
+
+  
+
+  updateStoria(idStoria: number, idScenario: number, nuovoTesto: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/storie/storie/${idStoria}/scenari/${idScenario}`, {}, {
+      params: { nuovoTesto },
+      ...this.httpOptions
+    }).pipe(
+      catchError(this.handleError('updateStoria'))
+    );
   }
 
-  deleteStoria(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/storie/${id}`);
+  getScenario(idStoria: number, idScenario: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/storie/${idStoria}/scenari/${idScenario}`, this.httpOptions).pipe(
+      catchError(this.handleError('getScenario'))
+    );
   }
 
-  // Metodi per interagire con gli utenti
-  getAllUtenti(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/utenti`);
+  inserisciScenario(idStoria: number, scenario: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/storie/scenari`, scenario, this.httpOptions).pipe(
+      catchError(this.handleError('inserisciScenario'))
+    );
   }
 
-  // Aggiungi questo metodo per il login
-  loginUtente(credentials: { username: string; password: string; }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/login`, credentials);
+  getScenariStoria(idStoria: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/storie/${idStoria}/scenari`, this.httpOptions).pipe(
+      catchError(this.handleError('getScenariStoria'))
+    );
   }
 
-
-  getUtenteByUsername(username: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/utenti/${username}`);
+  // Metodi per interagire con le sessioni di gioco
+  elaboraIndovinello(idPartita: number, idScenario: number, risposta: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/sessioni/SessioneGioco/${idPartita}/scenari/${idScenario}/indovinello`, {}, {
+      params: { risposta },
+      ...this.httpOptions
+    }).pipe(
+      catchError(this.handleError('elaboraIndovinello'))
+    );
   }
 
-  createUtente(utente: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/utenti`, utente);
+  elaboraAlternativa(idPartita: number, idScenario: number, idScelta: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/sessioni/SessioneGioco/${idPartita}/scenari/${idScenario}/alternativa`, {}, {
+      params: { idScelta: idScelta.toString() },
+      ...this.httpOptions
+    }).pipe(
+      catchError(this.handleError('elaboraAlternativa'))
+    );
   }
 
-  updateUtente(username: string, utente: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/utenti/${username}`, utente);
+  raccogliOggetto(idPartita: number, oggetto: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/sessioni/SessioneGioco/${idPartita}/inventario`, {}, {
+      params: { oggetto },
+      ...this.httpOptions
+    }).pipe(
+      catchError(this.handleError('raccogliOggetto'))
+    );
   }
 
-  deleteUtente(username: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/utenti/${username}`);
+  creaSessione(partita: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/sessioni/SessioneGioco/`, partita, this.httpOptions).pipe(
+      catchError(this.handleError('creaSessione'))
+    );
   }
 
-  // Aggiungi altri metodi per interagire con le altre entità del backend
+  eliminaSessione(idPartita: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/sessioni/SessioneGioco/${idPartita}`, this.httpOptions).pipe(
+      catchError(this.handleError('eliminaSessione'))
+    );
+  }
+
+  getSessioniUtente(username: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/sessioni/SessioneGioco/utente/${username}`, this.httpOptions).pipe(
+      catchError(this.handleError('getSessioniUtente'))
+    );
+  }
+
+  getSessioneConID(idPartita: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/sessioni/SessioneGioco/${idPartita}`, this.httpOptions).pipe(
+      catchError(this.handleError('getSessioneConID'))
+    );
+  }
+
+  // Metodi per interagire con l'autenticazione
+  registraUtente(username: string, password: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/auth/AuthController/register`, {}, {
+      params: { username, password },
+      ...this.httpOptions
+    }).pipe(
+      catchError(this.handleError('registraUtente'))
+    );
+  }
+
+  loginUtente(formData: { username: string; password: string }): Observable<any> {
+    return this.http.post(`${this.baseUrl}/auth/AuthController/login`, {}, {
+      params: { username: formData.username, password: formData.password },
+      ...this.httpOptions
+    }).pipe(
+      catchError(this.handleError('loginUtente'))
+    );
+}
+
+
+  getUtente(username: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/auth/AuthController/user/${username}`, this.httpOptions).pipe(
+      catchError(this.handleError('getUtente'))
+    );
+  }
+
+  // Gestione degli errori
+  private handleError(operation = 'operation') {
+    return (error: any): Observable<never> => {
+      console.error(`${operation} failed: ${error.message}`);
+      return throwError(() => new Error(`Operazione ${operation} fallita: ${error.message}`));
+    };
+  }
 }

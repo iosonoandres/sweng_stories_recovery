@@ -1,0 +1,40 @@
+.play-story-card {
+  margin: 20px;
+  padding: 20px;
+}
+
+.inventory-card {
+  margin: 20px;
+  padding: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.button-group {
+  margin-top: 20px;
+}
+
+mat-card-title {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+mat-card-content p {
+  margin-bottom: 20px;
+}
+
+mat-form-field {
+  margin-bottom: 20px;
+}
+
+mat-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+mat-chip {
+  font-size: 1em;
+}
