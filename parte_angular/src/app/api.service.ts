@@ -75,8 +75,8 @@ export class ApiService {
   }
 
   // Metodi per interagire con le sessioni di gioco
-  elaboraIndovinello(idPartita: number, idScenario: number, risposta: string): Observable<any> {
-    return this.http.put(`${this.baseUrl}/sessioni/SessioneGioco/${idPartita}/scenari/${idScenario}/indovinello`, {}, {
+  elaboraIndovinello(idSessione: String, idScenario: number, risposta: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/sessioni/SessioneGioco/${idSessione}/scenari/${idScenario}/indovinello`, {}, {
       params: { risposta },
       ...this.httpOptions
     }).pipe(
@@ -84,17 +84,19 @@ export class ApiService {
     );
   }
 
-  elaboraAlternativa(idPartita: number, idScenario: number, idScelta: number): Observable<any> {
-    return this.http.put(`${this.baseUrl}/sessioni/SessioneGioco/${idPartita}/scenari/${idScenario}/alternativa`, {}, {
-      params: { idScelta: idScelta.toString() },
+  elaboraAlternativa(idSessione: string, testoAlternativa: string, idScenarioSuccessivo: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/sessioni/SessioneGioco/${idSessione}/scenari/${idScenarioSuccessivo}/alternativa`, {}, {
+      params: { testoAlternativa: testoAlternativa },  // Parametro per il testo dell'alternativa
       ...this.httpOptions
     }).pipe(
       catchError(this.handleError('elaboraAlternativa'))
     );
   }
+  
+  
 
-  raccogliOggetto(idPartita: number, oggetto: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/sessioni/SessioneGioco/${idPartita}/inventario`, {}, {
+  raccogliOggetto(idSessione: String, oggetto: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/sessioni/SessioneGioco/${idSessione}/inventario`, {}, {
       params: { oggetto },
       ...this.httpOptions
     }).pipe(
@@ -108,8 +110,8 @@ export class ApiService {
     );
   }
 
-  eliminaSessione(idPartita: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/sessioni/SessioneGioco/${idPartita}`, this.httpOptions).pipe(
+  eliminaSessione(idSessione: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/sessioni/SessioneGioco/${idSessione}`, this.httpOptions).pipe(
       catchError(this.handleError('eliminaSessione'))
     );
   }
@@ -120,8 +122,8 @@ export class ApiService {
     );
   }
 
-  getSessioneConID(idPartita: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/sessioni/SessioneGioco/${idPartita}`, this.httpOptions).pipe(
+  getSessioneConID(idSessione: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/sessioni/SessioneGioco/${idSessione}`, this.httpOptions).pipe(
       catchError(this.handleError('getSessioneConID'))
     );
   }
