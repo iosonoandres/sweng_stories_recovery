@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public interface OpSessioneGioco {
 
     public Scenario elaboraIndovinello(int idScenario, String risposta, String idSessione);
-    public Scenario elaboraAlternativa(int idScenario, String testoAlternativa,
+    public Scenario elaboraAlternativa(int idScenarioDiPartenza, int idScenario, String testoAlternativa,
                                        String idSessione);
     public Inventario raccogliOggetto(String idSessione, String oggetto);
 

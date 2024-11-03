@@ -84,14 +84,21 @@ export class ApiService {
     );
   }
 
-  elaboraAlternativa(idSessione: string, testoAlternativa: string, idScenarioSuccessivo: number): Observable<any> {
-    return this.http.put(`${this.baseUrl}/sessioni/SessioneGioco/${idSessione}/scenari/${idScenarioSuccessivo}/alternativa`, {}, {
-      params: { testoAlternativa: testoAlternativa },  // Parametro per il testo dell'alternativa
-      ...this.httpOptions
-    }).pipe(
+  elaboraAlternativa(idSessione: string, idScenarioDiPartenza: number, idScenarioSuccessivo: number, testoAlternativa: string): Observable<any> {
+    return this.http.put(
+      `${this.baseUrl}/sessioni/SessioneGioco/${idSessione}/scenari/${idScenarioSuccessivo}/alternativa/${idScenarioDiPartenza}`, 
+      {}, 
+      {
+        params: {
+          testoAlternativa: testoAlternativa // Passa `testoAlternativa` come parametro della query
+        },
+        ...this.httpOptions
+      }
+    ).pipe(
       catchError(this.handleError('elaboraAlternativa'))
     );
   }
+  
   
   
 

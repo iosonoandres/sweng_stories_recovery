@@ -28,43 +28,61 @@ export class GiocaStoriaComponent implements OnInit {
       console.log(this.idSessione);
       this.inventory = state.inventory || [];
       this.currentScenario = this.storia?.inizio || null;
+  
+      // Controlla se currentScenario è impostato
+      if (!this.currentScenario) {
+        console.error('Errore: currentScenario è null');
+        this.router.navigate(['/seleziona-storia']);
+      }
+  
       console.log('Alternative disponibili:', this.currentScenario?.alternative);
-
-
-
       console.log('Storia e sessione ricevute:', this.storia, this.idSessione, this.currentScenario);
     } else {
       console.error('Errore: nessuna storia o sessione passata allo stato.');
       this.router.navigate(['/seleziona-storia']);
     }
   }
+  
 
   submitRiddle(): void {
-    if (this.currentScenario && this.currentScenario.indovinelli && this.currentScenario.indovinelli.length > 0 && this.idSessione) {
-      const indovinello = this.currentScenario.indovinelli[0];
-      this.apiService.elaboraIndovinello(this.idSessione, this.currentScenario.idScenario, this.userRiddleAnswer).subscribe(response => {
-        const isCorrect = response.esito;
-        if (isCorrect) {
-          const nextScenarioId = indovinello.idScenarioRispGiusta;
-          this.apiService.getScenario(this.storiaId, nextScenarioId).subscribe(nextScenario => {
-            this.currentScenario = nextScenario;
-          });
-        }
-        this.userRiddleAnswer = '';
-      });
+    if (this.currentScenario && this.currentScenario.indovinello && this.idSessione) {
+      const indovinello = this.currentScenario.indovinello;
+      this.apiService.elaboraIndovinello(this.idSessione, this.currentScenario.idScenario, this.userRiddleAnswer)
+        .subscribe(response => {
+
+          console.log("Risposta api Indovinello: ", response);
+        });
     }
   }
+  
+  
 
   makeChoice(alternative: Alternativa): void {
     if (this.idSessione && this.currentScenario) {
-      console.log("ID SESSSIONE "+this.idSessione + " TESTOALTERNATIVA "+alternative.testoAlternativa)
-      console.log("ID MAKE CHOICE: ", alternative.idScenarioSuccessivo);
-      this.apiService.elaboraAlternativa(this.idSessione, alternative.testoAlternativa, alternative.idScenarioSuccessivo).subscribe(response => {
-      
-      console.log(response);
-      });
+      const idScenarioDiPartenza = this.currentScenario.idScenario;
+      console.log("ID SESSIONE:", this.idSessione);
+      console.log("ID SCENARIO DI PARTENZA:", idScenarioDiPartenza);
+      console.log("ID SCENARIO SUCCESSIVO:", alternative.idScenarioSuccessivo);
+      console.log("TESTO ALTERNATIVA:", alternative.testoAlternativa);
+  
+      this.apiService.elaboraAlternativa(this.idSessione, idScenarioDiPartenza, alternative.idScenarioSuccessivo, alternative.testoAlternativa)
+        .subscribe(response => {
+          console.log("Risposta dalla chiamata API:", response);
+  
+          // Aggiorna `currentScenario` con il nuovo scenario
+          this.currentScenario = response;
+  
+          // Usa il punto esclamativo per indicare che currentScenario non è null
+          if (this.currentScenario!.indovinello) {
+            console.log("Nuovo indovinello trovato:", this.currentScenario!.indovinello);
+          }
+        });
     }
   }
+  
+  
+  
+
 
   collectItem(item: Oggetto): void {
     if (this.idSessione) {

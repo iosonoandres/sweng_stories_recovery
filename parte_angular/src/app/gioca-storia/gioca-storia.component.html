@@ -1,47 +1,29 @@
-<mat-card class="play-story-card" *ngIf="currentScenario">
-  <mat-card-title>{{ currentScenario.descrizione }}</mat-card-title>
+<mat-card class="play-story-card" *ngIf="currentScenario as scenario">
+  <mat-card-title>{{ scenario.descrizione }}</mat-card-title>
   <mat-card-content>
-    <!-- Descrizione dello scenario -->
     <div>
-      <p>{{ currentScenario.descrizione }}</p>
+      <p>{{ scenario.descrizione }}</p>
     </div>
 
     <!-- Sezione Indovinello -->
-    <div *ngIf="currentScenario.indovinelli && currentScenario.indovinelli.length > 0">
-      <h3>{{ currentScenario.indovinelli[0].testoIndovinello }}</h3>
+    <div *ngIf="scenario.indovinello">
+      <h3>{{ scenario.indovinello.testoIndovinello }}</h3>
 
-      <!-- Input per la risposta -->
       <mat-form-field appearance="fill" class="full-width">
         <mat-label>Rispondi all'indovinello</mat-label>
         <input matInput [(ngModel)]="userRiddleAnswer" placeholder="Inserisci la tua risposta">
       </mat-form-field>
 
-      <!-- Pulsante per inviare la risposta -->
       <button mat-raised-button color="primary" (click)="submitRiddle()">Invia Risposta</button>
     </div>
 
-  <!-- 
-    
-  <mat-card *ngFor="let alternativa of currentScenario.alternative" class="alternative-card">
-      <mat-card-content>
-        <p>{{ alternativa.testoAlternativa || 'Descrizione non trovata' }}</p>
-        <pre>{{ alternativa | json }}</pre> <!-- Questo mostrerà l'intero oggetto JSON di `alternativa` 
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-raised-button color="primary" (click)="makeChoice(alternativa)">
-          Scegli
-        </button>
-      </mat-card-actions>     //COMMENTO PER DEBUG FRONT END
-    </mat-card  -->
-    
-
     <!-- Sezione Alternative -->
-    <div *ngIf="currentScenario.alternative && currentScenario.alternative.length > 0; else noAlternatives">
+    <div *ngIf="scenario.alternative && scenario.alternative.length > 0; else noAlternatives">
       <h3>Scegli una delle seguenti opzioni</h3>
       <div class="alternatives-container">
-        <mat-card *ngFor="let alternativa of currentScenario.alternative" class="alternative-card">
+        <mat-card *ngFor="let alternativa of scenario.alternative" class="alternative-card">
           <mat-card-content>
-            <p>{{ alternativa.testoAlternativa }}</p> <!-- Assicurati che "descrizione" sia la proprietà corretta -->
+            <p>{{ alternativa.testoAlternativa }}</p>
           </mat-card-content>
           <mat-card-actions>
             <button mat-raised-button color="primary" (click)="makeChoice(alternativa)">
@@ -55,12 +37,10 @@
       <p class="no-alternatives-text">Nessuna alternativa disponibile per questo scenario.</p>
     </ng-template>
 
-
-
     <!-- Oggetti da raccogliere -->
-    <div *ngIf="currentScenario.oggetti && currentScenario.oggetti.length > 0; else noItems">
+    <div *ngIf="scenario.oggetti && scenario.oggetti.length > 0; else noItems">
       <h3>Oggetti disponibili</h3>
-      <div *ngFor="let item of currentScenario.oggetti">
+      <div *ngFor="let item of scenario.oggetti">
         <button mat-raised-button color="warn" (click)="collectItem(item)">
           Raccogli {{ item.nome }}
         </button>

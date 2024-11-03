@@ -21,17 +21,19 @@ public class SessioneGiocoController {
     public Scenario elaboraIndovinello(
             @PathVariable int idScenario,
             @RequestParam String risposta,
-            @PathVariable String idSessione) {
+            @PathVariable String idSessione
+            ) {
         return serviceSessioneGioco.elaboraIndovinello(idScenario, risposta, idSessione);
     }
 
-    @PutMapping("/SessioneGioco/{idSessione}/scenari/{idScenario}/alternativa")
+    @PutMapping("/SessioneGioco/{idSessione}/scenari/{idScenario}/alternativa/{idScenarioDiPartenza}")
     public Scenario elaboraAlternativa(
         @PathVariable int idScenario,
         @RequestParam String testoAlternativa,
-        @PathVariable String idSessione) {
+        @PathVariable String idSessione,
+        @PathVariable int idScenarioDiPartenza) {
                 System.out.println("\n\n\n\nID SCEEENARIOOOOO "+idScenario);
-                Scenario scenario = serviceSessioneGioco.elaboraAlternativa(idScenario, testoAlternativa, idSessione);
+                Scenario scenario = serviceSessioneGioco.elaboraAlternativa(idScenarioDiPartenza, idScenario, testoAlternativa, idSessione);
         return scenario;
     }
 
