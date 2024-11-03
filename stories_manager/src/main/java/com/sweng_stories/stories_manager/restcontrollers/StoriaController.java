@@ -67,7 +67,7 @@ public class StoriaController {
         return serviceStoria.inserisciScenario(scenario);
     }
 
-    @GetMapping("/{idStoria}/scenari")
+    @GetMapping("/scenaristoria/{idStoria}")
     public ArrayList<Scenario> getScenariStoria(@PathVariable int idStoria) {
         return serviceStoria.getScenariStoria(idStoria);
     }
