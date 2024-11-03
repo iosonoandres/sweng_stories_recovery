@@ -28,30 +28,34 @@ public class ServiceSessioneGioco implements OpSessioneGioco {
 
         int idStoria = partita.getIdStoria();
 
-        Scenario scenario = sessioneStoriaDao.getScenario(idScenario,idStoria);
+        Scenario scenario = sessioneStoriaDao.getScenario(idStoria,idScenario);
         Indovinello indovinello = scenario.getIndovinello();
 
         if(indovinello == null)
             return null;
 
         boolean esito = indovinello.getRisposta().equals(risposta);
+        System.out.println("\n\n\n\nesito "+ esito + "\n\n");
+        
 
         if(esito){
             int idScenarioSuccessivo = indovinello.getIdScenarioRispGiusta(); //dipende da getRispostaCorretta.scenarioId
+            System.out.println("\n\n\nid scenario successivo if "+ idScenarioSuccessivo);
 
             System.out.println("RISPOSTA INDOVINELLo" + indovinello.getRisposta());
             System.out.println("RISPOSTA INDOVINELLo" + indovinello.getRisposta());
             System.out.println("RISPOSTA INDOVINELLo" + indovinello.getRisposta());
 
-            Scenario scenarioSuccessivo = sessioneStoriaDao.getScenario(idScenarioSuccessivo,idStoria);
+            Scenario scenarioSuccessivo = sessioneStoriaDao.getScenario(idStoria,idScenarioSuccessivo);
             partita.setIdScenarioCorrente(scenarioSuccessivo.getIdScenario());
             sessioneGiocoDao.aggiornaSessione(partita);
 
             return scenarioSuccessivo;
         }else{
             int idScenarioErrato = indovinello.getIdScenarioRispSbagliata(); //dipende da getRispostaSbagliata.scenarioId da correggere
+            System.out.println("ID SCENARUIII SUCCESSIVO RISPOSTA ERRATA   "+idScenarioErrato);
 
-            Scenario scenarioSuccessivo = sessioneStoriaDao.getScenario(idScenarioErrato,idStoria);
+            Scenario scenarioSuccessivo = sessioneStoriaDao.getScenario(idStoria,idScenarioErrato);
             partita.setIdScenarioCorrente(scenarioSuccessivo.getIdScenario());
             sessioneGiocoDao.aggiornaSessione(partita);
 
@@ -71,7 +75,7 @@ public class ServiceSessioneGioco implements OpSessioneGioco {
 
         int idStoria = partita.getIdStoria();
 
-        Scenario scenario = sessioneStoriaDao.getScenario(idScenarioDiPartenza,idStoria);
+        Scenario scenario = sessioneStoriaDao.getScenario(idStoria,idScenarioDiPartenza);
 
 
         Alternativa alternativa = null;
@@ -106,7 +110,7 @@ public class ServiceSessioneGioco implements OpSessioneGioco {
 
         int idScenarioSuccessivo = alternativa.getIdScenarioSuccessivo();
 
-        Scenario scenarioSuccessivo = sessioneStoriaDao.getScenario(idScenarioSuccessivo,idStoria);
+        Scenario scenarioSuccessivo = sessioneStoriaDao.getScenario(idStoria,idScenarioSuccessivo);
         System.out.println("SCENARIO SUCC" + scenarioSuccessivo);
         System.out.println(scenarioSuccessivo);
         System.out.println(scenarioSuccessivo);

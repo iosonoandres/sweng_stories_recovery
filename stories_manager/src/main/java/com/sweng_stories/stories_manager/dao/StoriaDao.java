@@ -232,7 +232,7 @@ public class StoriaDao implements OpStoriaDao {
     }
 
     @Override
-    public Scenario getScenario(int idScenario, int idStoria) {
+    public Scenario getScenario(int idStoria, int idScenario) {
         System.out.println("Cercando scenario con idStoria: " + idStoria + ", idScenario: " + idScenario);
 
         Document query = new Document("idStoria", idStoria)
@@ -252,9 +252,6 @@ public class StoriaDao implements OpStoriaDao {
             Object alternativeField = scenarioDoc.get("alternative");
             if (alternativeField instanceof List) {
                 alternativeDocs = (List<Document>) alternativeField;
-            } else {
-                System.out.println("Il campo 'alternative' non è una lista. Tipo effettivo: "
-                        + alternativeField.getClass().getName());
             }
 
             if (alternativeDocs == null) {

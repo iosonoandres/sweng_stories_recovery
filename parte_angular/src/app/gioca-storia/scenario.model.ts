@@ -12,7 +12,7 @@ export interface Indovinello {
 export interface Oggetto {
   id: number;
   nome: string;
-  descrizione: string;
+  testoScenario: string;
 }
 
 export interface Alternativa {
@@ -23,7 +23,7 @@ export interface Alternativa {
 
 export interface Scenario {
   idScenario: number;
-  descrizione: string;
+  testoScenario: string;
   indovinello: Indovinello | null;
   oggetti: Oggetto[];
   alternative: Alternativa[];  // Lista delle alternative per questo scenario
@@ -32,7 +32,7 @@ export interface Scenario {
 export interface Storia {
   id: number;
   titolo: string;
-  descrizione: string;
+  testoScenario: string;
   inizio: Scenario; // Scenario iniziale della storia
   finali?: Scenario[]; // Eventuali scenari finali della storia
   indovinello?: Indovinello;

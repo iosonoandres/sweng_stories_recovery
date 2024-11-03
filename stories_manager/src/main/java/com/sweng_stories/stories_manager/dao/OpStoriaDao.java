@@ -11,7 +11,7 @@ public interface OpStoriaDao {
     public ArrayList<Storia> getStoriaConUsername(String username);
     public Storia inserisciStoria(Storia storia);
     public Scenario modificaScenario(int idScenario, int idStoria, String nuovoTesto);
-    public Scenario getScenario(int idScenario, int idStoria);
+    public Scenario getScenario(int idStoria, int idScenario);
     public boolean inserisciScenario(Scenario scenario);
     public ArrayList<Scenario> getScenariStoria(int idStoria);
 }

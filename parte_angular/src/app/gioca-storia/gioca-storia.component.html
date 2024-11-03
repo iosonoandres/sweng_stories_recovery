@@ -1,9 +1,11 @@
 <mat-card class="play-story-card" *ngIf="currentScenario as scenario">
-  <mat-card-title>{{ scenario.descrizione }}</mat-card-title>
+  <mat-card-title>{{ scenario.testoScenario }}</mat-card-title>
   <mat-card-content>
     <div>
-      <p>{{ scenario.descrizione }}</p>
+      <p>{{ scenario.testoScenario }}</p>
     </div>
+
+    
 
     <!-- Sezione Indovinello -->
     <div *ngIf="scenario.indovinello">
@@ -34,7 +36,6 @@
       </div>
     </div>
     <ng-template #noAlternatives>
-      <p class="no-alternatives-text">Nessuna alternativa disponibile per questo scenario.</p>
     </ng-template>
 
     <!-- Oggetti da raccogliere -->
@@ -47,7 +48,6 @@
       </div>
     </div>
     <ng-template #noItems>
-      <p>Nessun oggetto disponibile da raccogliere in questo scenario.</p>
     </ng-template>
   </mat-card-content>
 </mat-card>

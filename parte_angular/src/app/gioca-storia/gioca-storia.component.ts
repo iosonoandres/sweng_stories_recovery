@@ -17,6 +17,7 @@ export class GiocaStoriaComponent implements OnInit {
   storia: Storia | null = null;
   idSessione: string | null = null;
 
+
   constructor(private route: ActivatedRoute, private apiService: ApiService, private router: Router) {}
 
   ngOnInit(): void {
@@ -42,7 +43,7 @@ export class GiocaStoriaComponent implements OnInit {
       this.router.navigate(['/seleziona-storia']);
     }
   }
-  
+
 
   submitRiddle(): void {
     if (this.currentScenario && this.currentScenario.indovinello && this.idSessione) {
@@ -51,6 +52,9 @@ export class GiocaStoriaComponent implements OnInit {
         .subscribe(response => {
 
           console.log("Risposta api Indovinello: ", response);
+          // Aggiorna `currentScenario` con il nuovo scenario
+          this.currentScenario = response;
+          console.log(this.currentScenario);
         });
     }
   }
