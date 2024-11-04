@@ -73,7 +73,8 @@ export class CreaStoriaComponent implements OnInit {
     const alternatives = this.scenarios.at(index).get('alternatives') as FormArray;
     const alternative = this.fb.group({
       text: ['', Validators.required],
-      leadsTo: [null, Validators.required]  // Definisci `leadsTo` come FormControl
+      leadsTo: [null, Validators.required],  // Definisci `leadsTo` come FormControl
+      oggettoRichiesto: [''] // aggiunto `oggettoRichiesto` per allinearlo al template
     });
     alternatives.push(alternative);
   }
@@ -135,6 +136,7 @@ export class CreaStoriaComponent implements OnInit {
           });
 
           console.log('Storia creata con successo!', response);
+          console.log(storyData)
           this.router.navigate(['/dashboard']); // Reindirizza dopo la creazione
         },
         error => {
@@ -175,6 +177,7 @@ export class CreaStoriaComponent implements OnInit {
   // Prepara i dati della storia come JSON
   private prepareStoryData() {
     const initialScenario = this.storyForm.value.scenarios[0];
+    
 
     return {
       titolo: this.storyForm.value.title,
@@ -190,6 +193,7 @@ export class CreaStoriaComponent implements OnInit {
           oggettoRichiesto: alt.oggettoRichiesto || ''
         })),
 
+
         indovinello: initialScenario.isRiddle ? {
           idScenario: this.scenarioCounter++,
           idScenarioRispGiusta: initialScenario.correctLeadsTo, // Collegamento per risposta corretta
@@ -203,6 +207,13 @@ export class CreaStoriaComponent implements OnInit {
       username: 'utenteCorrente' // Sostituisci con l'username attuale
     };
   }
+
+  getAvailableItems(): string[] {
+    return this.scenarios.controls
+      .map(scenario => scenario.get('item')?.value)
+      .filter(item => item); // Filter out empty items
+  }
+  
 
   private prepareScenarioData(idStoria: number, item: any, index: number, isEnding: boolean) {
     if (isEnding) {
