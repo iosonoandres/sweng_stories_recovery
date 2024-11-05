@@ -1,51 +1,76 @@
-<mat-card class="play-story-card" *ngIf="currentScenario">
-  <mat-card-title>{{ currentScenario.descrizione }}</mat-card-title>
+<mat-card class="play-story-card" *ngIf="currentScenario as scenario">
+  <mat-card-title>{{ scenario.testoScenario }}</mat-card-title>
   <mat-card-content>
-    <!-- Descrizione dello scenario -->
     <div>
-      <p>{{ currentScenario.descrizione }}</p>
+      <p>{{ scenario.testoScenario }}</p>
     </div>
 
+    
+
     <!-- Sezione Indovinello -->
-    <div *ngIf="currentScenario.indovinelli && currentScenario.indovinelli.length > 0">
-      <h3>{{ currentScenario.indovinelli[0].testoIndovinello }}</h3> <!-- Testo dell'indovinello -->
-      
-      <!-- Input per la risposta -->
+    <div *ngIf="scenario.indovinello">
+      <h3>{{ scenario.indovinello.testoIndovinello }}</h3>
+
       <mat-form-field appearance="fill" class="full-width">
         <mat-label>Rispondi all'indovinello</mat-label>
         <input matInput [(ngModel)]="userRiddleAnswer" placeholder="Inserisci la tua risposta">
       </mat-form-field>
 
-      <!-- Pulsante per inviare la risposta -->
       <button mat-raised-button color="primary" (click)="submitRiddle()">Invia Risposta</button>
     </div>
 
     <!-- Sezione Alternative -->
-    <div *ngIf="currentScenario.alternatives && currentScenario.alternatives.length > 0; else noAlternatives">
+    <div *ngIf="scenario.alternative && scenario.alternative.length > 0; else noAlternatives">
       <h3>Scegli una delle seguenti opzioni</h3>
-      <div *ngFor="let alternative of currentScenario.alternatives">
-        <button mat-raised-button 
-                color="accent" 
-                (click)="makeChoice(alternative)">
-          {{ alternative.text }}
-        </button>
+      <div class="alternatives-container">
+        <mat-card *ngFor="let alternativa of scenario.alternative" class="alternative-card">
+          <mat-card-content>
+            <p>{{ alternativa.testoAlternativa }}</p>
+        
+            <!-- Display the required item if it exists -->
+            <p *ngIf="alternativa.oggettoRichiesto && !isAlternativeUnlocked(alternativa)" class="required-item">
+              Richiede: {{ alternativa.oggettoRichiesto }}
+            </p>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-raised-button color="primary" 
+                    (click)="makeChoice(alternativa)"
+                    [disabled]="!isAlternativeUnlocked(alternativa)">
+              Scegli
+            </button>
+          </mat-card-actions>
+        </mat-card>
       </div>
     </div>
     <ng-template #noAlternatives>
-      <p>Nessuna alternativa disponibile per questo scenario.</p>
     </ng-template>
 
-    <!-- Oggetti da raccogliere -->
-    <div *ngIf="currentScenario.oggetti && currentScenario.oggetti.length > 0; else noItems">
-      <h3>Oggetti disponibili</h3>
-      <div *ngFor="let item of currentScenario.oggetti">
-        <button mat-raised-button color="warn" (click)="collectItem(item)">
-          Raccogli {{ item.nome }}
-        </button>
-      </div>
+    <!-- oggetto da raccogliere -->
+    <div *ngIf="scenario.oggetto; else noItems">
+      <h3>Oggetto disponibile</h3>
+      <button mat-raised-button color="warn" (click)="collectItem(scenario.oggetto)">
+        Raccogli {{ scenario.oggetto }}
+      </button>
     </div>
     <ng-template #noItems>
       <p>Nessun oggetto disponibile in questo scenario.</p>
     </ng-template>
   </mat-card-content>
 </mat-card>
+
+<!-- Inventario dell'utente -->
+<mat-card class="inventory-card" *ngIf="inventory.length > 0">
+  <mat-card-title>Inventario</mat-card-title>
+  <mat-card-content>
+    <div>
+      <mat-chip-list>
+        <mat-chip *ngFor="let item of inventory" color="primary" selected>
+          {{ item }}
+        </mat-chip>
+      </mat-chip-list>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<!-- Pulsante per terminare la sessione -->
+<button mat-raised-button color="warn" (click)="terminaSessione()">Termina Sessione</button>

@@ -173,7 +173,6 @@ public class StoriaDao implements OpStoriaDao {
         ObjectId objectId = new ObjectId();
         storia.setId(objectId.hashCode());
 
-
         // Creazione del documento per l'oggetto `Scenario`
         Document scenarioDoc = new Document()
                 .append("idStoria", storia.getInizio().getIdStoria())
@@ -225,27 +224,52 @@ public class StoriaDao implements OpStoriaDao {
 
     @Override
     public Scenario modificaScenario(int idScenario, int idStoria, String nuovoTesto) {
-        Document query = new Document("_id", new ObjectId(String.valueOf(idStoria)))
-                .append("scenari.id", idScenario);
-        Document update = new Document("$set", new Document("scenari.$.testoScenario", nuovoTesto));
-        storieCollection.updateOne(query, update);
-        return getScenario(idScenario, idStoria);
+        // Crea la query per trovare lo scenario con idStoria e idScenario specificati
+        Document query = new Document("idStoria", idStoria)
+                .append("idScenario", idScenario);
+
+        // Crea l'aggiornamento per impostare il campo `testoScenario` a `nuovoTesto`
+        Document update = new Document("$set", new Document("testoScenario", nuovoTesto));
+
+        // Esegui l'aggiornamento nella collezione
+        scenariCollection.updateOne(query, update);
+
+        // Ritorna lo scenario aggiornato utilizzando il metodo getScenario
+        return getScenario(idStoria, idScenario);
     }
 
     @Override
     public Scenario getScenario(int idStoria, int idScenario) {
         System.out.println("Cercando scenario con idStoria: " + idStoria + ", idScenario: " + idScenario);
-    
+
         Document query = new Document("idStoria", idStoria)
                 .append("idScenario", idScenario);
         System.out.println("Query generata: " + query.toJson());
-    
+
         Document scenarioDoc = scenariCollection.find(query).first();
         System.out.println("Risultato della query: " + scenarioDoc);
-    
+
         if (scenarioDoc != null) {
+            // Log del contenuto di scenarioDoc per capire cosa contiene
+            System.out.println("Documento Scenario trovato: " + scenarioDoc.toJson());
+
             // Conversione della lista `alternative` da Document a Alternativa
             List<Document> alternativeDocs = (List<Document>) scenarioDoc.get("alternative");
+
+            Object alternativeField = scenarioDoc.get("alternative");
+            if (alternativeField instanceof List) {
+                alternativeDocs = (List<Document>) alternativeField;
+            }
+
+            if (alternativeDocs == null) {
+                System.out.println("Il campo 'alternative' è nullo o non esiste.");
+            } else {
+                System.out.println("Alternative trovate: " + alternativeDocs.size());
+                for (Document altDoc : alternativeDocs) {
+                    System.out.println("Alternativa Document: " + altDoc.toJson());
+                }
+            }
+
             List<Alternativa> alternativeList = new ArrayList<>();
             if (alternativeDocs != null) {
                 for (Document altDoc : alternativeDocs) {
@@ -253,12 +277,11 @@ public class StoriaDao implements OpStoriaDao {
                             altDoc.getInteger("idScenario"),
                             altDoc.getInteger("idScenarioSuccessivo"),
                             altDoc.getString("testoAlternativa"),
-                            altDoc.getString("oggettoRichiesto")
-                    );
+                            altDoc.getString("oggettoRichiesto"));
                     alternativeList.add(alternativa);
                 }
             }
-    
+
             // Conversione dell’indovinello, se presente
             Document indovinelloDoc = (Document) scenarioDoc.get("indovinello");
             Indovinello indovinello = null;
@@ -269,27 +292,24 @@ public class StoriaDao implements OpStoriaDao {
                         indovinelloDoc.getString("testoIndovinello"),
                         indovinelloDoc.getString("risposta"),
                         indovinelloDoc.getString("rispostaSbagliata"),
-                        indovinelloDoc.getInteger("idScenarioRispSbagliata")
-                );
+                        indovinelloDoc.getInteger("idScenarioRispSbagliata"));
             }
-    
+
             Scenario scenario = new Scenario(
                     scenarioDoc.getInteger("idStoria"),
                     scenarioDoc.getInteger("idScenario"),
                     scenarioDoc.getString("testoScenario"),
                     scenarioDoc.getString("oggetto"),
                     alternativeList,
-                    indovinello
-            );
-            
+                    indovinello);
+
             System.out.println("Scenario trovato: " + scenario);
             return scenario;
         }
-    
         System.out.println("Nessuno scenario trovato per la query specificata.");
         return null;
     }
-            
+
     @Override
     public boolean inserisciScenario(Scenario scenario) {
         ObjectId objectId = new ObjectId();
@@ -336,10 +356,11 @@ public class StoriaDao implements OpStoriaDao {
 
     @Override
     public ArrayList<Scenario> getScenariStoria(int idStoria) {
-        // Creiamo la query per cercare gli scenari con il campo "idStoria" specificato
+        // Creiamo la query per cercare tutti gli scenari con il campo "idStoria"
+        // specificato
         Document query = new Document("idStoria", idStoria);
 
-        // Eseguiamo la ricerca nella collezione "scenariocollection"
+        // Eseguiamo la ricerca nella collezione "scenariCollection"
         FindIterable<Document> scenariDocs = scenariCollection.find(query);
 
         // Inizializziamo la lista degli scenari da restituire
@@ -347,14 +368,48 @@ public class StoriaDao implements OpStoriaDao {
 
         // Iteriamo sui documenti trovati e li convertiamo in oggetti Scenario
         for (Document scenarioDoc : scenariDocs) {
+            // Log per verificare il contenuto di ogni documento
+            System.out.println("Documento Scenario trovato: " + scenarioDoc.toJson());
+
+            // Conversione della lista `alternative` da Document a Alternativa
+            List<Document> alternativeDocs = (List<Document>) scenarioDoc.get("alternative");
+            List<Alternativa> alternativeList = new ArrayList<>();
+            if (alternativeDocs != null) {
+                for (Document altDoc : alternativeDocs) {
+                    Alternativa alternativa = new Alternativa(
+                            altDoc.getInteger("idScenario"),
+                            altDoc.getInteger("idScenarioSuccessivo"),
+                            altDoc.getString("testoAlternativa"),
+                            altDoc.getString("oggettoRichiesto"));
+                    alternativeList.add(alternativa);
+                }
+            }
+
+            // Conversione dell’indovinello, se presente
+            Document indovinelloDoc = (Document) scenarioDoc.get("indovinello");
+            Indovinello indovinello = null;
+            if (indovinelloDoc != null) {
+                indovinello = new Indovinello(
+                        indovinelloDoc.getInteger("idScenario"),
+                        indovinelloDoc.getInteger("idScenarioRispGiusta"),
+                        indovinelloDoc.getString("testoIndovinello"),
+                        indovinelloDoc.getString("risposta"),
+                        indovinelloDoc.getString("rispostaSbagliata"),
+                        indovinelloDoc.getInteger("idScenarioRispSbagliata"));
+            }
+
+            // Creiamo l'oggetto Scenario e aggiungiamolo alla lista
             Scenario scenario = new Scenario(
                     scenarioDoc.getInteger("idStoria"),
                     scenarioDoc.getInteger("idScenario"),
                     scenarioDoc.getString("testoScenario"),
                     scenarioDoc.getString("oggetto"),
-                    scenarioDoc.getList("alternative", Alternativa.class),
-                    scenarioDoc.get("indovinello", Indovinello.class));
+                    alternativeList,
+                    indovinello);
             scenari.add(scenario);
+
+            // Log per verificare lo scenario creato
+            System.out.println("Scenario aggiunto alla lista: " + scenario);
         }
 
         return scenari; // Restituiamo la lista di scenari trovati

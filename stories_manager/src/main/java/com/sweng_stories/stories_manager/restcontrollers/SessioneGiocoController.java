@@ -17,27 +17,31 @@ public class SessioneGiocoController {
     @Autowired
     private OpSessioneGioco serviceSessioneGioco;
 
-    @PutMapping("/SessioneGioco/{idPartita}/scenari/{idScenario}/indovinello")
+    @PutMapping("/SessioneGioco/{idSessione}/scenari/{idScenario}/indovinello")
     public Scenario elaboraIndovinello(
             @PathVariable int idScenario,
             @RequestParam String risposta,
-            @PathVariable int idPartita) {
-        return serviceSessioneGioco.elaboraIndovinello(idScenario, risposta, idPartita);
+            @PathVariable String idSessione
+            ) {
+        return serviceSessioneGioco.elaboraIndovinello(idScenario, risposta, idSessione);
     }
 
-    @PutMapping("/SessioneGioco/{idPartita}/scenari/{idScenario}/alternativa")
+    @PutMapping("/SessioneGioco/{idSessione}/scenari/{idScenario}/alternativa/{idScenarioDiPartenza}")
     public Scenario elaboraAlternativa(
-            @PathVariable int idScenario,
-            @RequestParam int idScelta,
-            @PathVariable int idPartita) {
-        return serviceSessioneGioco.elaboraAlternativa(idScenario, idScelta, idPartita);
+        @PathVariable int idScenario,
+        @RequestParam String testoAlternativa,
+        @PathVariable String idSessione,
+        @PathVariable int idScenarioDiPartenza) {
+                System.out.println("\n\n\n\nID SCEEENARIOOOOO "+idScenario);
+                Scenario scenario = serviceSessioneGioco.elaboraAlternativa(idScenarioDiPartenza, idScenario, testoAlternativa, idSessione);
+        return scenario;
     }
 
-    @PostMapping("/SessioneGioco/{idPartita}/inventario")
+    @PostMapping("/SessioneGioco/{idSessione}/inventario")
     public Inventario raccogliOggetto(
-            @PathVariable int idPartita,
+            @PathVariable String idSessione,
             @RequestParam String oggetto) {
-        return serviceSessioneGioco.raccogliOggetto(idPartita, oggetto);
+        return serviceSessioneGioco.raccogliOggetto(idSessione, oggetto);
     }
 
     @PostMapping("/SessioneGioco/")
@@ -45,9 +49,9 @@ public class SessioneGiocoController {
         return serviceSessioneGioco.creaSessione(partita);
     }
 
-    @DeleteMapping("/SessioneGioco/{idPartita}")
-    public boolean eliminaSessione(@PathVariable int idPartita) {
-        return serviceSessioneGioco.eliminaSessione(idPartita);
+    @DeleteMapping("/SessioneGioco/{idSessione}")
+    public boolean eliminaSessione(@PathVariable String idSessione) {
+        return serviceSessioneGioco.eliminaSessione(idSessione);
     }
 
     @GetMapping("/SessioneGioco/utente/{username}")
@@ -55,8 +59,8 @@ public class SessioneGiocoController {
         return serviceSessioneGioco.getSessioniUtente(username);
     }
 
-    @GetMapping("/SessioneGioco/{idPartita}")
-    public SessioneGioco getSessioneConID(@PathVariable int idPartita) {
-        return serviceSessioneGioco.getSessioneConID(idPartita);
+    @GetMapping("/SessioneGioco/{idSessione}")
+    public SessioneGioco getSessioneConID(@PathVariable String idSessione) {
+        return serviceSessioneGioco.getSessioneConID(idSessione);
     }
 }

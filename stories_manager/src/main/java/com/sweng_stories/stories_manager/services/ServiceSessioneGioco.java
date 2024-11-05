@@ -1,6 +1,7 @@
 package com.sweng_stories.stories_manager.services;
 
 import com.sweng_stories.stories_manager.dao.OpSessioneGiocoDao;
+import com.sweng_stories.stories_manager.dao.OpStoriaDao;
 import com.sweng_stories.stories_manager.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,9 +14,13 @@ import java.util.List;
 public class ServiceSessioneGioco implements OpSessioneGioco {
     @Autowired
     OpSessioneGiocoDao sessioneGiocoDao;
+
+    @Autowired
+    OpStoriaDao sessioneStoriaDao;
+
     @Override
-    public Scenario elaboraIndovinello(int idScenario, String risposta, int idPartita) {
-        SessioneGioco partita = sessioneGiocoDao.getSessioneConID(idPartita);
+    public Scenario elaboraIndovinello(int idScenario, String risposta, String idSessione) {
+        SessioneGioco partita = sessioneGiocoDao.getSessioneConID(idSessione);
 
         if(partita == null){
             return null;
@@ -23,26 +28,34 @@ public class ServiceSessioneGioco implements OpSessioneGioco {
 
         int idStoria = partita.getIdStoria();
 
-        Scenario scenario = sessioneGiocoDao.getScenarioCorrente(idStoria,idScenario);
+        Scenario scenario = sessioneStoriaDao.getScenario(idStoria,idScenario);
         Indovinello indovinello = scenario.getIndovinello();
 
         if(indovinello == null)
             return null;
 
         boolean esito = indovinello.getRisposta().equals(risposta);
+        System.out.println("\n\n\n\nesito "+ esito + "\n\n");
+        
 
         if(esito){
             int idScenarioSuccessivo = indovinello.getIdScenarioRispGiusta(); //dipende da getRispostaCorretta.scenarioId
+            System.out.println("\n\n\nid scenario successivo if "+ idScenarioSuccessivo);
 
-            Scenario scenarioSuccessivo = sessioneGiocoDao.getScenarioCorrente(idStoria,idScenarioSuccessivo);
+            System.out.println("RISPOSTA INDOVINELLo" + indovinello.getRisposta());
+            System.out.println("RISPOSTA INDOVINELLo" + indovinello.getRisposta());
+            System.out.println("RISPOSTA INDOVINELLo" + indovinello.getRisposta());
+
+            Scenario scenarioSuccessivo = sessioneStoriaDao.getScenario(idStoria,idScenarioSuccessivo);
             partita.setIdScenarioCorrente(scenarioSuccessivo.getIdScenario());
             sessioneGiocoDao.aggiornaSessione(partita);
 
             return scenarioSuccessivo;
         }else{
             int idScenarioErrato = indovinello.getIdScenarioRispSbagliata(); //dipende da getRispostaSbagliata.scenarioId da correggere
+            System.out.println("ID SCENARUIII SUCCESSIVO RISPOSTA ERRATA   "+idScenarioErrato);
 
-            Scenario scenarioSuccessivo = sessioneGiocoDao.getScenarioCorrente(idStoria,idScenarioErrato);
+            Scenario scenarioSuccessivo = sessioneStoriaDao.getScenario(idStoria,idScenarioErrato);
             partita.setIdScenarioCorrente(scenarioSuccessivo.getIdScenario());
             sessioneGiocoDao.aggiornaSessione(partita);
 
@@ -51,27 +64,45 @@ public class ServiceSessioneGioco implements OpSessioneGioco {
     }
 
     @Override
-    public Scenario elaboraAlternativa(int idScenario,
-                                       int idScelta, int idPartita) {
-        SessioneGioco partita = sessioneGiocoDao.getSessioneConID(idPartita);
+    public Scenario elaboraAlternativa(int idScenarioDiPartenza, int idScenario,
+                                       String testoAlternativa, String idSessione) {
+        SessioneGioco partita = sessioneGiocoDao.getSessioneConID(idSessione);
+
+       
 
         if(partita == null)
             return null;
 
         int idStoria = partita.getIdStoria();
 
-        Scenario scenario = sessioneGiocoDao.getScenarioCorrente(idStoria,idScenario);
+        Scenario scenario = sessioneStoriaDao.getScenario(idStoria,idScenarioDiPartenza);
 
-        List<Alternativa> decisioni = scenario.getAlternative();
 
-        if(idScelta > decisioni.size()-1 || idScelta < 0){
-            return null;
+        Alternativa alternativa = null;
+
+        System.out.println(scenario);
+
+        for(Alternativa alt : scenario.getAlternative()){
+            System.out.println(alt.getTestoAlternativa());
+            if(alt.getTestoAlternativa().equals(testoAlternativa)){
+                alternativa=alt;
+                System.out.println("ALTTTTT BACKKK" + alternativa);
+                System.out.println("ALTTTTT BACKKK" + alternativa);
+                System.out.println("ALTTTTT BACKKK" + alternativa);
+
+            }
         }
 
-        Alternativa alternativa = scenario.getAlternative().get(idScelta);
+        System.out.println("ALTTTTT BACKKK" + alternativa);
+        
+
         String oggettoNecessario = alternativa.getOggettoRichiesto();
 
         if(!oggettoNecessario.isEmpty()){
+            System.out.println("CIAOOOOO" );
+            System.out.println("CIAOOOOO");
+            System.out.println("CIAOOOOO");
+    
             Inventario inventario = partita.getInventario();
             if(!inventario.getOggetti().contains(oggettoNecessario))
                 return null;
@@ -79,7 +110,12 @@ public class ServiceSessioneGioco implements OpSessioneGioco {
 
         int idScenarioSuccessivo = alternativa.getIdScenarioSuccessivo();
 
-        Scenario scenarioSuccessivo = sessioneGiocoDao.getScenarioCorrente(idStoria,idScenarioSuccessivo);
+        Scenario scenarioSuccessivo = sessioneStoriaDao.getScenario(idStoria,idScenarioSuccessivo);
+        System.out.println("SCENARIO SUCC" + scenarioSuccessivo);
+        System.out.println(scenarioSuccessivo);
+        System.out.println(scenarioSuccessivo);
+
+        
         partita.setIdScenarioCorrente(scenarioSuccessivo.getIdScenario());
         sessioneGiocoDao.aggiornaSessione(partita);
 
@@ -87,8 +123,8 @@ public class ServiceSessioneGioco implements OpSessioneGioco {
     }
 
     @Override
-    public Inventario raccogliOggetto(int idPartita, String oggetto) {
-        SessioneGioco partita = sessioneGiocoDao.getSessioneConID(idPartita);
+    public Inventario raccogliOggetto(String idSessione, String oggetto) {
+        SessioneGioco partita = sessioneGiocoDao.getSessioneConID(idSessione);
 
         if(partita == null)
             return null;
@@ -110,8 +146,8 @@ public class ServiceSessioneGioco implements OpSessioneGioco {
     }
 
     @Override
-    public boolean eliminaSessione(int idPartita) {
-        return sessioneGiocoDao.eliminaSessione(idPartita);
+    public boolean eliminaSessione(String idSessione) {
+        return sessioneGiocoDao.eliminaSessione(idSessione);
     }
 
     @Override
@@ -120,7 +156,7 @@ public class ServiceSessioneGioco implements OpSessioneGioco {
     }
 
     @Override
-    public SessioneGioco getSessioneConID(int idPartita) {
-        return sessioneGiocoDao.getSessioneConID(idPartita);
+    public SessioneGioco getSessioneConID(String idSessione) {
+        return sessioneGiocoDao.getSessioneConID(idSessione);
     }
 }

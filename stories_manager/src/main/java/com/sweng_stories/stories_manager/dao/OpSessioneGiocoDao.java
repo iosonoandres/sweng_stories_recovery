@@ -8,9 +8,9 @@ import java.util.ArrayList;
 public interface OpSessioneGiocoDao {
 
     public SessioneGioco creaSessione(SessioneGioco sessione);
-    public boolean eliminaSessione(int idSessione);
+    public boolean eliminaSessione(String idSessione);
     public ArrayList<SessioneGioco> getSessioniUtente(String username);
-    public SessioneGioco getSessioneConID(int idSessione);
+    public SessioneGioco getSessioneConID(String idSessione);
 
     Scenario getScenarioCorrente(int idStoria, int idScenario);
 

@@ -9,6 +9,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,24 +30,28 @@ public class SessioneGiocoDao implements OpSessioneGiocoDao {
     public SessioneGioco creaSessione(SessioneGioco partita) {
         ObjectId objectId = new ObjectId();
 
+        // Imposta l'idSessione nella partita prima di salvarla
+        partita.setIdSessione(objectId.toString());
+
         // Gestione dell'inventario vuoto
         List<String> inventarioOggetti = (partita.getInventario() != null) ? partita.getInventario().getOggetti()
                 : new ArrayList<>();
 
+        // Creazione e salvataggio del documento con idSessione già impostato
         Document document = new Document("_id", objectId)
+                .append("idSessione", partita.getIdSessione())
                 .append("username", partita.getUsername())
                 .append("idStoria", partita.getIdStoria())
                 .append("idScenarioCorrente", partita.getIdScenarioCorrente())
                 .append("inventario", inventarioOggetti);
 
         sessioniCollection.insertOne(document);
-        partita.setIdSessione(objectId.hashCode());
         return partita;
     }
 
     @Override
-    public boolean eliminaSessione(int idPartita) {
-        Document query = new Document("_id", new ObjectId(String.valueOf(idPartita)));
+    public boolean eliminaSessione(String idSessione) {
+        Document query = new Document("_id", new ObjectId(String.valueOf(idSessione)));
         return sessioniCollection.deleteOne(query).wasAcknowledged();
     }
 
@@ -60,16 +65,16 @@ public class SessioneGiocoDao implements OpSessioneGiocoDao {
                     result.getInteger("idStoria"),
                     result.getInteger("idScenarioCorrente"),
                     new Inventario(result.getList("inventario", String.class)));
-            sessione.setIdSessione(result.getObjectId("_id").hashCode());
+            sessione.setIdSessione(result.getObjectId("_id").toString());
             sessioni.add(sessione);
         }
         return sessioni;
     }
 
     @Override
-    public SessioneGioco getSessioneConID(int idPartita) {
-        // Cerca usando "idSessione" come intero invece di "_id" come ObjectId
-        Document query = new Document("idSessione", idPartita);
+    public SessioneGioco getSessioneConID(String idSessione) {
+        // Crea una query per cercare il campo idSessione
+        Document query = new Document("idSessione", idSessione);
         Document result = sessioniCollection.find(query).first();
 
         if (result != null) {
@@ -78,8 +83,8 @@ public class SessioneGiocoDao implements OpSessioneGiocoDao {
                     result.getInteger("idStoria"),
                     result.getInteger("idScenarioCorrente"),
                     new Inventario(result.getList("inventario", String.class)));
-            sessione.setIdSessione(result.getInteger("idSessione")); // Imposta idSessione direttamente dall'attributo
-                                                                     // "idSessione" del documento
+
+            sessione.setIdSessione(idSessione); // Imposta direttamente idSessione
             return sessione;
         }
         return null;

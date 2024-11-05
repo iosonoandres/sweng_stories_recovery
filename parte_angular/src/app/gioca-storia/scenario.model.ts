@@ -12,30 +12,30 @@ export interface Indovinello {
 export interface Oggetto {
   id: number;
   nome: string;
-  descrizione: string;
+  testoScenario: string;
 }
 
-export interface Alternative {
-  text: string;
+export interface Alternativa {
+  testoAlternativa: string;
   type: string; // "with-items", "without-items", "indovinello"
-  nextScenarioId: number;  // ID dello scenario successivo associato a questa alternativa
+  idScenarioSuccessivo: number;  // ID dello scenario successivo associato a questa alternativa
+  oggettoRichiesto?: string;     // Nome dell'oggetto richiesto (aggiunta)
 }
 
 export interface Scenario {
-  id: number;
-  descrizione: string;
-  indovinelli: Indovinello[];
-  oggetti: Oggetto[];
-  alternatives: Alternative[];  // Lista delle alternative per questo scenario
+  idScenario: number;
+  testoScenario: string;
+  indovinello: Indovinello | null;
+  oggetto: string;
+  alternative: Alternativa[];  // Lista delle alternative per questo scenario
 }
 
 export interface Storia {
   id: number;
   titolo: string;
-  descrizione: string;
-  inizio: Scenario;
-  finali: Scenario[];
-  scenari: Scenario[];
-  indovinello: Indovinello;
-  inventario: { oggetti: Oggetto[] };
+  testoScenario: string;
+  inizio: Scenario; // Scenario iniziale della storia
+  finali?: Scenario[]; // Eventuali scenari finali della storia
+  indovinello?: Indovinello;
+  inventario?: { oggetti: Oggetto[] };
 }

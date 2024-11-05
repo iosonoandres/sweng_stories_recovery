@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../api.service';
-import { Observable, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { Scenario, Oggetto, Storia, Alternative, Indovinello } from './scenario.model';
+import { Scenario, Oggetto, Storia, Alternativa } from './scenario.model';
+import { response } from 'express';
 
 @Component({
   selector: 'app-gioca-storia',
@@ -12,145 +11,103 @@ import { Scenario, Oggetto, Storia, Alternative, Indovinello } from './scenario.
 })
 export class GiocaStoriaComponent implements OnInit {
   currentScenario: Scenario | null = null;
-  inventory: Oggetto[] = [];
+  inventory: string[]=[]; 
   userRiddleAnswer: string = '';
   storiaId: number = 0;
   storia: Storia | null = null;
-  sessioneId: number | null = null;
+  idSessione: string | null = null;
+
 
   constructor(private route: ActivatedRoute, private apiService: ApiService, private router: Router) {}
 
   ngOnInit(): void {
-    // Otteniamo l'ID della storia dall'URL
-    this.route.paramMap.pipe(
-      switchMap(params => {
-        const id = params.get('id');
-        if (id !== null) {
-          this.storiaId = +id;
-          console.log("id storia giocaaaa" + this.storiaId);
-          // Carichiamo la sessione esistente se disponibile
-          return this.apiService.getSessioneConID(this.storiaId);
-        } else {
-          return of(null);
-        }
-      })
-    ).subscribe(sessione => {
-      if (sessione) {
-        this.sessioneId = sessione.idSessione;
-        this.inventory = sessione.inventario ? sessione.inventario.oggetti : [];
-        this.loadStoryAndScenario();
-      } else {
-        console.log('Sessione non trovata, creando una nuova sessione per la storia selezionata.');
-        this.creaNuovaSessione(); // Metodo per creare una nuova sessione se non esiste
+    const state = history.state;
+    if (state.selectedStoria && state.idSessione) { 
+      this.storia = state.selectedStoria;
+      this.storiaId = state.selectedStoria.id;
+      this.idSessione = state.idSessione;
+      console.log(this.idSessione);
+      this.inventory = state.inventory || [];
+      this.currentScenario = this.storia?.inizio || null;
+  
+      // Controlla se currentScenario è impostato
+      if (!this.currentScenario) {
+        console.error('Errore: currentScenario è null');
+        this.router.navigate(['/seleziona-storia']);
       }
-    });
-  }
-
-  creaNuovaSessione(): void {
-    this.apiService.creaSessione({
-      idStoria: this.storiaId,
-      username: 'utenteCorrente',
-      idScenarioCorrente: 0,  // Assicurati di passare lo scenario iniziale o specifico
-      inventario: { oggetti: [] }
-    }).subscribe(newSessione => {
-      if (newSessione) {
-        this.sessioneId = newSessione.idSessione;
-        this.inventory = newSessione.inventario.oggetti;
-
-        // Inizializza currentScenario e carica il primo scenario
-        this.apiService.getScenario(this.storiaId, newSessione.idScenarioCorrente).subscribe(scenario => {
-          if (scenario) {
-            this.currentScenario = scenario;
-            console.log('Scenario iniziale caricato:', this.currentScenario);
-          } else {
-            console.error('Errore: scenario iniziale non trovato');
-          }
-        });
-      } else {
-        console.error('Errore nella creazione della nuova sessione');
-      }
-    });
-  }
-
-  loadStoryAndScenario(): void {
-    this.apiService.getStoriaById(this.storiaId).subscribe(storia => {
-      if (storia) {
-        this.storia = storia;
-
-        // Verifica che `scenari` sia definito e non vuoto
-        if (storia.scenari && storia.scenari.length > 0) {
-          const scenarioCorrente = storia.scenari.find((sc: Scenario) => sc.id === (this.sessioneId ? this.sessioneId : 0));
-
-          if (scenarioCorrente) {
-            this.currentScenario = scenarioCorrente;
-            console.log('Scenario corrente:', this.currentScenario); // Aggiunto per il debug
-          } else {
-            console.error('Scenario iniziale non trovato.');
-          }
-        } else {
-          console.error('Nessuno scenario trovato nella storia.');
-        }
-      } else {
-        console.error('Errore: storia non trovata');
-      }
-    });
-  }
-
-  makeChoice(alternative: Alternative): void {
-    if (this.sessioneId && this.currentScenario) {
-      this.apiService.elaboraAlternativa(this.sessioneId, this.currentScenario.id, alternative.nextScenarioId).subscribe(response => {
-        const nextScenario = this.storia?.scenari.find(sc => sc.id === alternative.nextScenarioId);
-        if (nextScenario) {
-          this.currentScenario = nextScenario;
-          this.userRiddleAnswer = ''; // Reset user answer after making a choice
-        } else {
-          console.error('Scenario successivo non trovato per ID:', alternative.nextScenarioId);
-        }
-      });
+  
+      console.log('Alternative disponibili:', this.currentScenario?.alternative);
+      console.log('Storia e sessione ricevute:', this.storia, this.idSessione, this.currentScenario);
+    } else {
+      console.error('Errore: nessuna storia o sessione passata allo stato.');
+      this.router.navigate(['/seleziona-storia']);
     }
   }
+
 
   submitRiddle(): void {
-    if (this.currentScenario && this.currentScenario.indovinelli && this.currentScenario.indovinelli.length > 0 && this.sessioneId) {
-      const indovinello = this.currentScenario.indovinelli[0];
-      this.apiService.elaboraIndovinello(this.sessioneId, this.currentScenario.id, this.userRiddleAnswer).subscribe(response => {
-        const isCorrect = response.esito;
-        if (isCorrect) {
-          console.log('Risposta corretta!');
-          const nextScenario = this.storia?.scenari.find(sc => sc.id === indovinello.idScenarioRispGiusta);
-          if (nextScenario) {
-            this.currentScenario = nextScenario;
-          } else {
-            console.error('Scenario successivo non trovato per ID:', indovinello.idScenarioRispGiusta);
+    if (this.currentScenario && this.currentScenario.indovinello && this.idSessione) {
+      const indovinello = this.currentScenario.indovinello;
+      this.apiService.elaboraIndovinello(this.idSessione, this.currentScenario.idScenario, this.userRiddleAnswer)
+        .subscribe(response => {
+
+          console.log("Risposta api Indovinello: ", response);
+          // Aggiorna `currentScenario` con il nuovo scenario
+          this.currentScenario = response;
+          console.log(this.currentScenario);
+        });
+    }
+  }
+  
+  
+
+  makeChoice(alternative: Alternativa): void {
+    if (this.idSessione && this.currentScenario) {
+      const idScenarioDiPartenza = this.currentScenario.idScenario;
+      console.log("ID SESSIONE:", this.idSessione);
+      console.log("ID SCENARIO DI PARTENZA:", idScenarioDiPartenza);
+      console.log("ID SCENARIO SUCCESSIVO:", alternative.idScenarioSuccessivo);
+      console.log("TESTO ALTERNATIVA:", alternative.testoAlternativa);
+  
+      this.apiService.elaboraAlternativa(this.idSessione, idScenarioDiPartenza, alternative.idScenarioSuccessivo, alternative.testoAlternativa)
+        .subscribe(response => {
+          console.log("Risposta dalla chiamata API:", response);
+  
+          // Aggiorna `currentScenario` con il nuovo scenario
+          this.currentScenario = response;
+  
+          // Usa il punto esclamativo per indicare che currentScenario non è null
+          if (this.currentScenario!.indovinello) {
+            console.log("Nuovo indovinello trovato:", this.currentScenario!.indovinello);
           }
-        } else {
-          console.log('Risposta errata:', this.userRiddleAnswer);
-        }
-        this.userRiddleAnswer = '';
-      });
+        });
     }
   }
 
-  collectItem(item: Oggetto): void {
-    if (this.sessioneId) {
-      this.apiService.raccogliOggetto(this.sessioneId, item.nome).subscribe(() => {
+  isAlternativeUnlocked(alternative: Alternativa): boolean {
+    // Verifica se l'alternativa richiede un oggetto specifico
+    if (alternative.oggettoRichiesto) {
+      return this.inventory.some(item => item === alternative.oggettoRichiesto);
+    }
+    // Se non è richiesto alcun oggetto, l'alternativa è sbloccata di default
+    return true;
+  }
+ 
+
+
+  collectItem(item: string): void {
+    if (this.idSessione) {
+      this.apiService.raccogliOggetto(this.idSessione, item).subscribe(() => {
         this.inventory.push(item);
-        if (this.currentScenario && this.currentScenario.oggetti) {
-          this.currentScenario.oggetti = this.currentScenario.oggetti.filter(i => i.id !== item.id);
+        if (this.currentScenario && this.currentScenario.oggetto) {
+          this.currentScenario.oggetto = this.currentScenario.oggetto;
         }
       });
     }
   }
 
   terminaSessione(): void {
-    if (this.sessioneId) {
-      this.apiService.eliminaSessione(this.sessioneId).subscribe(() => {
-        console.log('Sessione terminata');
-        this.router.navigate(['/dashboard']);
-      });
-    } else {
-      console.log('Nessuna sessione attiva per terminare');
-      this.router.navigate(['/dashboard']);
-    }
+    console.log('Sessione terminata');
+    this.router.navigate(['/dashboard']);
   }
 }

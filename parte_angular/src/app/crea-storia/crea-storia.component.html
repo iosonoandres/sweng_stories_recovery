@@ -29,9 +29,10 @@
                 <!-- Domanda dell'indovinello -->
                 <mat-form-field appearance="fill" class="full-width">
                   <mat-label>Domanda dell'indovinello</mat-label>
-                  <textarea matInput placeholder="Inserisci la domanda" formControlName="riddleQuestion" required></textarea>
+                  <textarea matInput placeholder="Inserisci la domanda" formControlName="riddleQuestion"
+                    required></textarea>
                 </mat-form-field>
-              
+
                 <!-- Tipo di Indovinello -->
                 <mat-form-field appearance="fill" class="full-width">
                   <mat-label>Tipo di Indovinello</mat-label>
@@ -40,13 +41,13 @@
                     <mat-option value="numeric">Numerico</mat-option>
                   </mat-select>
                 </mat-form-field>
-              
+
                 <!-- Risposta corretta -->
                 <mat-form-field appearance="fill" class="full-width">
                   <mat-label>Risposta corretta</mat-label>
                   <input matInput placeholder="Inserisci la risposta corretta" formControlName="correctAnswer" required>
                 </mat-form-field>
-              
+
                 <!-- Risposta errata -->
                 <mat-form-field appearance="fill" class="full-width">
                   <mat-label>Risposta errata</mat-label>
@@ -74,7 +75,7 @@
                 </mat-form-field>
 
               </div>
-              
+
               <!-- Alternatives Section -->
               <div formArrayName="alternatives" *ngIf="!isRiddleScenario(i)">
                 <div *ngFor="let alternative of getAlternatives(i).controls; let j = index" [formGroupName]="j">
@@ -83,14 +84,26 @@
                     <mat-card-content>
                       <mat-form-field appearance="fill" class="full-width">
                         <mat-label>Descrivi l'alternativa</mat-label>
-                        <textarea matInput placeholder="Descrivi l'alternativa" formControlName="text" required></textarea>
+                        <textarea matInput placeholder="Descrivi l'alternativa" formControlName="text"
+                          required></textarea>
                       </mat-form-field>
+
+                      <mat-form-field appearance="fill" class="full-width">
+                        <mat-label>Oggetto Richiesto</mat-label>
+                        <mat-select formControlName="oggettoRichiesto">
+                          <mat-option *ngFor="let oggetto of getAvailableItems()" [value]="oggetto">
+                            {{ oggetto }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      
 
                       <!-- Collegamento a Scenario o Finale -->
                       <mat-form-field appearance="fill" class="full-width">
                         <mat-label>Collegamento a Scenario o Finale</mat-label>
                         <mat-select formControlName="leadsTo">
-                          <mat-option *ngFor="let option of getScenarioOptions(); trackBy: trackByFn" [value]="option.value">
+                          <mat-option *ngFor="let option of getScenarioOptions(); trackBy: trackByFn"
+                            [value]="option.value">
                             {{ option.label }}
                           </mat-option>
                         </mat-select>
@@ -110,8 +123,10 @@
 
       <!-- Button to Add New Scenario with Alternatives -->
       <div class="actions">
-        <button mat-raised-button color="primary" (click)="addScenarioWithAlternatives()">Aggiungi Scenario con Alternative</button>
-        <button mat-raised-button color="primary" (click)="addScenarioWithRiddle()">Aggiungi Scenario con Indovinello</button>
+        <button mat-raised-button color="primary" (click)="addScenarioWithAlternatives()">Aggiungi Scenario con
+          Alternative</button>
+        <button mat-raised-button color="primary" (click)="addScenarioWithRiddle()">Aggiungi Scenario con
+          Indovinello</button>
       </div>
 
       <!-- Endings Section -->
