@@ -17,6 +17,9 @@ export class GiocaStoriaComponent implements OnInit {
   storia: Storia | null = null;
   idSessione: string | null = null;
 
+  // Lista temporanea degli scenari
+  scenari: Scenario[] = [];
+
 
   constructor(private route: ActivatedRoute, private apiService: ApiService, private router: Router) {}
 
@@ -105,6 +108,28 @@ export class GiocaStoriaComponent implements OnInit {
       });
     }
   }
+
+  updateAvailableItems(): void {
+    if (this.storia) {
+      this.apiService.getScenariStoria(this.storia.id).subscribe(
+        (scenari) => {
+          this.scenari = scenari;
+
+          this.scenari.forEach((scenario: Scenario) => {
+            scenario.alternative.forEach((alternative: Alternativa) => {
+              if (alternative.oggettoRichiesto && this.inventory.includes(alternative.oggettoRichiesto)) {
+                alternative.oggettoRichiesto = ''; // Imposta su stringa vuota se già raccolto
+              }
+            });
+          });
+        },
+        (error) => {
+          console.error('Errore nel caricamento degli scenari della storia', error);
+        }
+      );
+    }
+  }
+
 
   terminaSessione(): void {
     console.log('Sessione terminata');
