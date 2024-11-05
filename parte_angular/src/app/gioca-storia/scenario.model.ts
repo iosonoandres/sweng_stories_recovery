@@ -19,6 +19,7 @@ export interface Alternativa {
   testoAlternativa: string;
   type: string; // "with-items", "without-items", "indovinello"
   idScenarioSuccessivo: number;  // ID dello scenario successivo associato a questa alternativa
+  oggettoRichiesto?: string;     // Nome dell'oggetto richiesto (aggiunta)
 }
 
 export interface Scenario {

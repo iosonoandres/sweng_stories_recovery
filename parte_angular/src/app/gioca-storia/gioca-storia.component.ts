@@ -83,9 +83,16 @@ export class GiocaStoriaComponent implements OnInit {
         });
     }
   }
-  
-  
-  
+
+  isAlternativeUnlocked(alternative: Alternativa): boolean {
+    // Verifica se l'alternativa richiede un oggetto specifico
+    if (alternative.oggettoRichiesto) {
+      return this.inventory.some(item => item.nome === alternative.oggettoRichiesto);
+    }
+    // Se non è richiesto alcun oggetto, l'alternativa è sbloccata di default
+    return true;
+  }
+ 
 
 
   collectItem(item: Oggetto): void {

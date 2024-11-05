@@ -26,9 +26,16 @@
         <mat-card *ngFor="let alternativa of scenario.alternative" class="alternative-card">
           <mat-card-content>
             <p>{{ alternativa.testoAlternativa }}</p>
+        
+            <!-- Display the required item if it exists -->
+            <p *ngIf="alternativa.oggettoRichiesto && !isAlternativeUnlocked(alternativa)" class="required-item">
+              Richiede: {{ alternativa.oggettoRichiesto }}
+            </p>
           </mat-card-content>
           <mat-card-actions>
-            <button mat-raised-button color="primary" (click)="makeChoice(alternativa)">
+            <button mat-raised-button color="primary" 
+                    (click)="makeChoice(alternativa)"
+                    [disabled]="!isAlternativeUnlocked(alternativa)">
               Scegli
             </button>
           </mat-card-actions>
