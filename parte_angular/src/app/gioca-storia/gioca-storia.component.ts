@@ -11,7 +11,7 @@ import { response } from 'express';
 })
 export class GiocaStoriaComponent implements OnInit {
   currentScenario: Scenario | null = null;
-  inventory: Oggetto[] = [];
+  inventory: string[]=[]; 
   userRiddleAnswer: string = '';
   storiaId: number = 0;
   storia: Storia | null = null;
@@ -87,7 +87,7 @@ export class GiocaStoriaComponent implements OnInit {
   isAlternativeUnlocked(alternative: Alternativa): boolean {
     // Verifica se l'alternativa richiede un oggetto specifico
     if (alternative.oggettoRichiesto) {
-      return this.inventory.some(item => item.nome === alternative.oggettoRichiesto);
+      return this.inventory.some(item => item === alternative.oggettoRichiesto);
     }
     // Se non è richiesto alcun oggetto, l'alternativa è sbloccata di default
     return true;
@@ -95,12 +95,12 @@ export class GiocaStoriaComponent implements OnInit {
  
 
 
-  collectItem(item: Oggetto): void {
+  collectItem(item: string): void {
     if (this.idSessione) {
-      this.apiService.raccogliOggetto(this.idSessione, item.nome).subscribe(() => {
+      this.apiService.raccogliOggetto(this.idSessione, item).subscribe(() => {
         this.inventory.push(item);
-        if (this.currentScenario && this.currentScenario.oggetti) {
-          this.currentScenario.oggetti = this.currentScenario.oggetti.filter(i => i.id !== item.id);
+        if (this.currentScenario && this.currentScenario.oggetto) {
+          this.currentScenario.oggetto = this.currentScenario.oggetto;
         }
       });
     }

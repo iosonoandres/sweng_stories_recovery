@@ -45,16 +45,15 @@
     <ng-template #noAlternatives>
     </ng-template>
 
-    <!-- Oggetti da raccogliere -->
-    <div *ngIf="scenario.oggetti && scenario.oggetti.length > 0; else noItems">
-      <h3>Oggetti disponibili</h3>
-      <div *ngFor="let item of scenario.oggetti">
-        <button mat-raised-button color="warn" (click)="collectItem(item)">
-          Raccogli {{ item.nome }}
-        </button>
-      </div>
+    <!-- oggetto da raccogliere -->
+    <div *ngIf="scenario.oggetto; else noItems">
+      <h3>Oggetto disponibile</h3>
+      <button mat-raised-button color="warn" (click)="collectItem(scenario.oggetto)">
+        Raccogli {{ scenario.oggetto }}
+      </button>
     </div>
     <ng-template #noItems>
+      <p>Nessun oggetto disponibile in questo scenario.</p>
     </ng-template>
   </mat-card-content>
 </mat-card>
@@ -66,7 +65,7 @@
     <div>
       <mat-chip-list>
         <mat-chip *ngFor="let item of inventory" color="primary" selected>
-          {{ item.nome }}
+          {{ item }}
         </mat-chip>
       </mat-chip-list>
     </div>

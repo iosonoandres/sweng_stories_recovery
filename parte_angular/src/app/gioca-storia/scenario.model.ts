@@ -26,7 +26,7 @@ export interface Scenario {
   idScenario: number;
   testoScenario: string;
   indovinello: Indovinello | null;
-  oggetti: Oggetto[];
+  oggetto: string;
   alternative: Alternativa[];  // Lista delle alternative per questo scenario
 }
 
